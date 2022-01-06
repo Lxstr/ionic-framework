@@ -54,7 +54,7 @@
 // Calendar / Body
 // -----------------------------------
 :host .calendar-body .calendar-month .calendar-month-grid {
-  @include padding(0px, 10px, 0px, 10px);
+  @include padding(3px, 10px, 0px, 10px);
 
   /**
    * Calendar on MD will show an empty row
