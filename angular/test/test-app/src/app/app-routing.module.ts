@@ -27,6 +27,7 @@ const routes: Routes = [
   { path: 'inputs', component: InputsComponent },
   { path: 'form', component: FormComponent },
   { path: 'modals', component: ModalComponent },
+  { path: 'modal-inline', loadChildren: () => import('./modal-inline').then(m => m.ModalInlineModule) },
   { path: 'view-child', component: ViewChildComponent },
   { path: 'providers', component: ProvidersComponent },
   { path: 'router-link', component: RouterLinkComponent },
