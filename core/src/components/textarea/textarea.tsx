@@ -1,8 +1,8 @@
-import { Build, Component, ComponentInterface, Element, Event, EventEmitter, Host, Method, Prop, State, Watch, h, readTask } from '@stencil/core';
+import { Build, Component, ComponentInterface, Element, Event, EventEmitter, Host, Method, Prop, State, Watch, h, writeTask } from '@stencil/core';
 
 import { getIonMode } from '../../global/ionic-global';
 import { Color, StyleEventDetail, TextareaChangeEventDetail } from '../../interface';
-import { debounceEvent, findItemLabel, inheritAttributes, raf } from '../../utils/helpers';
+import { debounceEvent, findItemLabel, inheritAttributes } from '../../utils/helpers';
 import { createColorClasses } from '../../utils/theme';
 
 /**
@@ -145,7 +145,8 @@ export class Textarea implements ComponentInterface {
   @Prop() wrap?: 'hard' | 'soft' | 'off';
 
   /**
-   * If `true`, the element height will increase based on the value.
+   * If `true`, the textarea container will grow and shrink based
+   * on the contents of the textarea.
    */
   @Prop() autoGrow = false;
 
@@ -218,20 +219,7 @@ export class Textarea implements ComponentInterface {
   }
 
   componentDidLoad() {
-    raf(() => this.runAutoGrow());
-  }
-
-  private runAutoGrow() {
-    const nativeInput = this.nativeInput;
-    if (nativeInput && this.autoGrow) {
-      readTask(() => {
-        nativeInput.style.height = 'auto';
-        nativeInput.style.height = nativeInput.scrollHeight + 'px';
-        if (this.textareaWrapper) {
-          this.textareaWrapper.style.height = nativeInput.scrollHeight + 'px';
-        }
-      });
-    }
+    this.runAutoGrow();
   }
 
   /**
@@ -275,6 +263,18 @@ export class Textarea implements ComponentInterface {
       'has-value': this.hasValue(),
       'has-focus': this.hasFocus
     });
+  }
+
+  private runAutoGrow() {
+    if (this.nativeInput && this.autoGrow) {
+      writeTask(() => {
+        if (this.textareaWrapper) {
+          // Replicated value is an attribute to be used in the stylesheet
+          // to set the inner contents of a pseudo element.
+          this.textareaWrapper.dataset.replicatedValue = this.value ?? '';
+        }
+      });
+    }
   }
 
   /**
